@@ -2,92 +2,70 @@
 import os
 import numpy as np 
 import matplotlib.pyplot as plt 
-from sklearn.preprocessing import OneHotEncoder 
-from tensorflow.keras.optimizers import SGD
 
 from soil_classifier.dataset import Landsat
-from soil_classifier.models import  ANN50, ANN50x50, ANN100, ANN500, \
-                                    ANN100x100, ANN100x100do, ANN100x100bn,\
-                                    ANN100x100x100
-
+from soil_classifier.models import minimals as models_lib
 
 cwd = os.getcwd()
 DATA_FOLDER = cwd + '/data/'
 OUTPUT_FOLDER = cwd + '/outputs/'
 
+#%% PARAMETERS
 SEED = 0
+
+# Model
+MODEL_NAME = 'ANN50x50'
+
+# Dataset
+X_DATA_PROC = 'standarization'
+Y_DATA_PROC = 'one-hot'
+
+# Training
+N_epochs = 200
+batch_size = 32
+
 np.random.seed(SEED)
 
 # %% Dataset loading
+print('\nDataset loading and processing')
 dataset = Landsat()
 
-x_train, y_train, x_test, y_test = dataset.load(shuffle=True, seed=SEED)
-num_classes = dataset.num_classes
-num_bands = dataset.num_bands
-
-# dataset standarization
-x_mean = np.mean(x_train,axis=0)
-x_std = np.std(x_train,axis=0)
-
-x_mean = np.transpose(x_mean[:,np.newaxis])
-x_std = np.transpose(x_std[:,np.newaxis])
-
-# Replace zero sigma values with 1
-x_std[x_std == 0] = 1
-
-x_train_norm = np.divide( (x_train-x_mean), x_std)
-x_test_norm = np.divide( (x_test-x_mean), x_std)
-
-# labels to one hot encoding
-onehotencoder = OneHotEncoder(categories='auto') 
-y_train = onehotencoder.fit_transform(y_train[:,np.newaxis]).toarray()
-y_test = onehotencoder.fit_transform(y_test[:,np.newaxis]).toarray() 
+dataset.load(shuffle=True, seed=SEED)
+x_train, y_train, x_test, y_test = dataset.posprocess(x_proc_type=X_DATA_PROC, y_proc_type=Y_DATA_PROC)
 
 #%% Model
-# super_model = ANN50()
-super_model = ANN50x50()
-# super_model = ANN100()
-# super_model = ANN500()
-# super_model = ANN100x100()
-# super_model = ANN100x100do()
-# super_model = ANN100x100bn()
-# super_model = ANN100x100x100()
-
-model = super_model.get_keras_model()
-
-metric = 'acc'
-loss = 'categorical_crossentropy'
-# optimizer = 'sgd'
-# optimizer = SGD(learning_rate=1e-4)
-optimizer = 'nadam'
-
-model.compile(loss=loss, optimizer=optimizer, metrics=[metric])
-
+print('\nLoading and compiling model {}'.format(model.name))
+model = models_lib.new_model(MODEL_NAME)
+model.compile()
 model.summary()
 
-
 #%% Training
-N_epochs = 500
-batch_size = 32
-
-history = model.fit(x_train_norm, y_train,
+print('\nTraining')
+history = model.fit(x_train, y_train,
                     epochs=N_epochs, batch_size=batch_size,
-                    validation_data=(x_test_norm, y_test))
+                    validation_data=(x_test, y_test))
 
+
+#%% evaluation
+print('\n')
 # show train accuracy
-score = model.evaluate(x_train_norm, y_train, verbose=0)
+score = model.evaluate(x_train, y_train, verbose=0)
 print('MODEL {} - train accuracy = {:.3f}'.format(model.name, score[1]))
 
 # show test accuracy
-score = model.evaluate(x_test_norm, y_test, verbose=0)
+score = model.evaluate(x_test, y_test, verbose=0)
 print('MODEL {} - test accuracy = {:.3f}'.format(model.name, score[1]))
+
+# append epochos to history
+epochs = range(1,N_epochs+1)
+history.history.update( {'epochs': epochs})
 
 # save history
 np.save(OUTPUT_FOLDER+'history_{}.npy'.format(model.name), history.history)
+print( 'Training history saved in ' + OUTPUT_FOLDER + 'history_{}.npy'.format(model.name) )
 
 #%% Plot training results
-epochs = range(1,N_epochs+1)
-
+print('\nSaving training plots in ' + OUTPUT_FOLDER)
 # loss
 fig = plt.figure(figsize=(16,8))
 plt.plot(epochs, history.history['loss'], label='loss')
@@ -116,16 +94,6 @@ plt.title('{} model - Accuracy'.format(model.name))
 fig.savefig(OUTPUT_FOLDER+'{}_acc.png'.format(model.name))
 plt.show(block=False)
 
-
 # %% save model
-model.save(OUTPUT_FOLDER+'{}.h5'.format(model.name))
-# serialize model to JSON
-model_json = model.to_json()
-with open(OUTPUT_FOLDER+'{}.json'.format(model.name), 'w') as json_file:
-    json_file.write(model_json)
-
-# serialize weights to HDF5
-model.save_weights(OUTPUT_FOLDER+'{}_weights.h5'.format(model.name))
-
-
-# %%
+print('\nSaving model in ' + OUTPUT_FOLDER)
+model.save(OUTPUT_FOLDER)

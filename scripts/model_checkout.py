@@ -14,11 +14,11 @@ def model_checkout(name, src_path=MODEL_SRC_PATH, dst_path=MODEL_DST_PATH):
     try:
         print('exporting {} from {} to {}'.format(name, src_path, dst_path))
         print('\tmodel json: {}'.format(model_json))
-        shutil.copyfile(MODEL_SRC_PATH + model_json, MODEL_DST_PATH + model_json)
+        shutil.copyfile(src_path + model_json, dst_path + model_json)
         print('\tmodel h5: {}'.format(model_h5))
-        shutil.copyfile(MODEL_SRC_PATH + model_h5, MODEL_DST_PATH + model_h5)
+        shutil.copyfile(src_path + model_h5, dst_path + model_h5)
         print('\tmodel weights: {}'.format(model_weights))
-        shutil.copyfile(MODEL_SRC_PATH + model_weights, MODEL_DST_PATH + model_weights)
+        shutil.copyfile(src_path + model_weights, dst_path + model_weights)
 
         print('model checkout done!')
     except:

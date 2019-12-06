@@ -6,16 +6,17 @@ from sklearn.preprocessing import OneHotEncoder
 from tensorflow.keras.models import model_from_json
 
 from soil_classifier.dataset import Landsat
-from soil_classifier.models import  ANN50, ANN100, ANN500, \
+from soil_classifier.models import  ANN50, ANN50x50, ANN100, ANN500, \
                                     ANN100x100, ANN100x100do, ANN100x100bn,\
                                     ANN100x100x100
 
+MODEL_NAME = 'ANN50x50th'
 
 cwd = os.getcwd()
 DATA_FOLDER = cwd + '/data/'
 OUTPUT_FOLDER = cwd + '/outputs/'
 MODELS_FOLDER = cwd + '/models/'
-FPGA_FOLDER = cwd + '/fpga/hls_minimal/'
+FPGA_FOLDER = cwd + '/fpga/hls_{}/'.format(MODEL_NAME)
 FPGA_INFERENCE_FILE = FPGA_FOLDER + 'tb_data/rtl_cosim_results.log'
 FPGA_X_DATA_FILE = DATA_FOLDER + 'sat_x_test.dat'
 
@@ -48,7 +49,6 @@ y_train = onehotencoder.fit_transform(y_train[:,np.newaxis]).toarray()
 y_test = onehotencoder.fit_transform(y_test[:,np.newaxis]).toarray() 
 
 #%% Model
-MODEL_NAME = 'ANN50x50'
 metric = 'acc'
 loss = 'categorical_crossentropy'
 optimizer = 'nadam'

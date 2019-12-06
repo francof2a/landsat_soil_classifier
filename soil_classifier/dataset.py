@@ -2,7 +2,9 @@
 import os
 import requests
 import numpy as np 
+from sklearn.preprocessing import OneHotEncoder 
 
+# https://archive.ics.uci.edu/ml/datasets/Statlog+(Landsat+Satellite)
 
 #%%
 DATASET_FILES = ['sat.doc', 'sat.trn', 'sat.tst']
@@ -11,7 +13,7 @@ class Landsat():
     def __init__(self, data_folder=None):
         cwd = os.getcwd()
 
-        self.name = 'landsat_dataset'
+        self.name = 'Landsat'
         self.url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/statlog/satimage/'
 
         if data_folder is None:
@@ -38,6 +40,13 @@ class Landsat():
 
         self.x_test = []
         self.y_test = []
+
+        self.x_mean = None
+        self.x_std = None
+        self.x_max = None
+
+        self.shuffle = True
+        self.seed = None
     
     def _check_host(self):
         check = False
@@ -96,6 +105,8 @@ class Landsat():
         # misc data
         self.data_dim = self.x_train.shape[1]
         self.num_classes = np.max(self.y_train)
+        self.shuffle = shuffle
+        self.seed = seed
         return
 
 
@@ -108,6 +119,41 @@ class Landsat():
                 raise IOError('Download error!')
         else:
             self._process(shuffle=shuffle, seed=seed)
+
+        return self.x_train, self.y_train, self.x_test, self.y_test
+
+    def posprocess(self, x_proc_type='standarization', y_proc_type='one-hot'):
+        self._process(shuffle=self.shuffle, seed=self.seed)
+
+        if x_proc_type == 'standarization':
+            # dataset standarization
+            x_mean = np.mean(self.x_train,axis=0)
+            x_std = np.std(self.x_train,axis=0)
+
+            x_mean = np.transpose(x_mean[:,np.newaxis])
+            x_std = np.transpose(x_std[:,np.newaxis])
+
+            # Replace zero sigma values with 1
+            x_std[x_std == 0] = 1
+
+            self.x_train = np.divide( (self.x_train-x_mean), x_std)
+            self.x_test = np.divide( (self.x_test-x_mean), x_std)
+            self.x_mean = x_mean
+            self.x_std = x_std
+        elif x_proc_type == 'normalization':
+            x_max = np.max(self.x_train,axis=0)
+            x_max[x_max == 0] = 1
+
+            self.x_train = np.divide(self.x_train, x_max)
+            self.x_test = np.divide(self.x_test, x_max)     
+
+            self.x_max = x_max
+
+        if y_proc_type == 'one-hot':
+            # labels to one hot encoding
+            onehotencoder = OneHotEncoder(categories='auto') 
+            self.y_train = onehotencoder.fit_transform(self.y_train[:,np.newaxis]).toarray()
+            self.y_test = onehotencoder.fit_transform(self.y_test[:,np.newaxis]).toarray() 
 
         return self.x_train, self.y_train, self.x_test, self.y_test
             

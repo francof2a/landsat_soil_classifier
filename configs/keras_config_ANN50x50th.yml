@@ -1,0 +1,14 @@
+KerasJson: /media/data/projects/landsat_soil_classifier/models/ANN50x50th.json
+KerasH5:   /media/data/projects/landsat_soil_classifier/models/ANN50x50th_weights.h5
+InputData: /media/data/projects/landsat_soil_classifier/data/sat_x_test.dat
+OutputPredictions: /media/data/projects/landsat_soil_classifier/data/sat_y_test.dat
+OutputDir: /media/data/projects/landsat_soil_classifier/fpga/hls_ANN50x50th
+ProjectName: fpga_ANN50x50th
+XilinxPart: xazu7eg-fbvb900-1-i
+ClockPeriod: 24.0
+
+IOType: io_parallel
+HLSConfig:
+  Model:
+    Precision: ap_fixed<24,8>
+    ReuseFactor: 4

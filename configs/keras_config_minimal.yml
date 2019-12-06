@@ -1,5 +1,5 @@
-KerasJson: /media/data/projects/landsat_soil_classifier/models/ANN100.json
-KerasH5:   /media/data/projects/landsat_soil_classifier/models/ANN100_weights.h5
+KerasJson: /media/data/projects/landsat_soil_classifier/models/ANN50x50.json
+KerasH5:   /media/data/projects/landsat_soil_classifier/models/ANN50x50_weights.h5
 InputData: /media/data/projects/landsat_soil_classifier/data/sat_x_test.dat
 OutputPredictions: /media/data/projects/landsat_soil_classifier/data/sat_y_test.dat 
 OutputDir: /media/data/projects/landsat_soil_classifier/fpga/hls_minimal
@@ -10,8 +10,8 @@ ClockPeriod: 24
 IOType: io_parallel # options: io_serial/io_parallel
 HLSConfig:
   Model:
-    Precision: ap_fixed<16,6>
-    ReuseFactor: 2
+    Precision: ap_fixed<24,8>
+    ReuseFactor: 4
     # Strategy: Latency
     # Strategy: Resource
   # LayerType:
