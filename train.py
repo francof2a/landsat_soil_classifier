@@ -6,7 +6,7 @@ from sklearn.preprocessing import OneHotEncoder
 from tensorflow.keras.optimizers import SGD
 
 from soil_classifier.dataset import Landsat
-from soil_classifier.models import  ANN100, ANN500, \
+from soil_classifier.models import  ANN50, ANN50x50, ANN100, ANN500, \
                                     ANN100x100, ANN100x100do, ANN100x100bn,\
                                     ANN100x100x100
 
@@ -44,9 +44,11 @@ y_train = onehotencoder.fit_transform(y_train[:,np.newaxis]).toarray()
 y_test = onehotencoder.fit_transform(y_test[:,np.newaxis]).toarray() 
 
 #%% Model
+# super_model = ANN50()
+super_model = ANN50x50()
 # super_model = ANN100()
 # super_model = ANN500()
-super_model = ANN100x100()
+# super_model = ANN100x100()
 # super_model = ANN100x100do()
 # super_model = ANN100x100bn()
 # super_model = ANN100x100x100()
@@ -68,12 +70,16 @@ model.summary()
 N_epochs = 500
 batch_size = 32
 
-history = model.fit(x_train, y_train,
+history = model.fit(x_train_norm, y_train,
                     epochs=N_epochs, batch_size=batch_size,
-                    validation_data=(x_test, y_test))
+                    validation_data=(x_test_norm, y_test))
+
+# show train accuracy
+score = model.evaluate(x_train_norm, y_train, verbose=0)
+print('MODEL {} - train accuracy = {:.3f}'.format(model.name, score[1]))
 
 # show test accuracy
-score = model.evaluate(x_test, y_test, verbose=0)
+score = model.evaluate(x_test_norm, y_test, verbose=0)
 print('MODEL {} - test accuracy = {:.3f}'.format(model.name, score[1]))
 
 # save history
@@ -112,9 +118,10 @@ plt.show(block=False)
 
 
 # %% save model
+model.save(OUTPUT_FOLDER+'{}.h5'.format(model.name))
 # serialize model to JSON
 model_json = model.to_json()
-with open(OUTPUT_FOLDER+'{}_model.json'.format(model.name), 'w') as json_file:
+with open(OUTPUT_FOLDER+'{}.json'.format(model.name), 'w') as json_file:
     json_file.write(model_json)
 
 # serialize weights to HDF5

@@ -1,0 +1,57 @@
+ANN50
+    Precision: ap_fixed<24,8>
+    ReuseFactor: 8
+
+"fpga_minimal": {
+"Latency": {
+    "LatencyBest": "16",
+    "LatencyAvg": "16",
+    "LatencyWorst": "16",
+    "PipelineII": "8",
+    "PipelineDepth": "17",
+    "PipelineType": "function"
+},
+"Timing": {
+    "Target": "24.00",
+    "Uncertainty": "3.00",
+    "Estimate": "17.922"
+},
+"Area": {
+    "BRAM_18K": "18",
+    "DSP48E": "526",
+    "FF": "14457",
+    "LUT": "79038",
+    "URAM": "0"
+}
+
+FPGA inference accuracy = 0.7185
+
+
+-----------------------------------------------------------
+ANN50
+    Precision: ap_fixed<24,8>
+    ReuseFactor: 4
+
+"fpga_minimal": {
+"Latency": {
+    "LatencyBest": "8",
+    "LatencyAvg": "8",
+    "LatencyWorst": "8",
+    "PipelineII": "4",
+    "PipelineDepth": "9",
+    "PipelineType": "function"
+},
+"Timing": {
+    "Target": "24.00",
+    "Uncertainty": "3.00",
+    "Estimate": "17.309"
+},
+"Area": {
+    "BRAM_18K": "18",
+    "DSP48E": "1050",
+    "FF": "6669",
+    "LUT": "93831",
+    "URAM": "0"
+}
+
+FPGA inference accuracy = 0.7185

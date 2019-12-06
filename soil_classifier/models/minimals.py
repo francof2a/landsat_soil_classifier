@@ -18,6 +18,52 @@ class ClassifierModel():
     def get_keras_model(self):
         return self.model
 
+class ANN50(ClassifierModel):
+    def __init__(self, name='ANN50'):
+        super().__init__()
+        self.name = name
+        self.model = self.build()
+
+    def build(self):
+        dataset = Landsat()
+        data_dim = dataset.data_dim
+        num_classes = dataset.num_classes
+
+        inputs = Input(shape=data_dim, name='input')
+
+        x = Flatten(name='flatten')(inputs)
+        x = Dense(50, activation='relu', name='fc1')(x)
+        outputs = Dense(num_classes, activation='softmax', name='predictions')(x)
+
+        # Model compiling
+        self.model = Model(inputs, outputs, name=self.name) 
+
+        return self.model 
+
+class ANN50x50(ClassifierModel):
+    def __init__(self, name='ANN50x50'):
+        super().__init__()
+        self.name = name
+        self.model = self.build()
+
+    def build(self):
+        dataset = Landsat()
+        data_dim = dataset.data_dim
+        num_classes = dataset.num_classes
+
+        inputs = Input(shape=data_dim, name='input')
+
+        x = Flatten(name='flatten')(inputs)
+        x = Dense(50, activation='relu', name='fc1')(x)
+        x = Dense(50, activation='relu', name='fc2')(x)
+        outputs = Dense(num_classes, activation='softmax', name='predictions')(x)
+
+        # Model compiling
+        self.model = Model(inputs, outputs, name=self.name) 
+
+        return self.model 
+
+
 class ANN100(ClassifierModel):
     def __init__(self, name='ANN100'):
         super().__init__()
