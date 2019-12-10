@@ -1,4 +1,4 @@
-name: soil_class2
+name: soil_class
 channels:
   - conda-forge
   - defaults
