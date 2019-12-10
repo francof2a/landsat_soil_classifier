@@ -168,7 +168,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>8c1cc0c8</spirit:value>
+            <spirit:value>fe4d05f6</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -184,7 +184,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>d2e98805</spirit:value>
+            <spirit:value>e350f0c2</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -200,7 +200,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>9ae3f7f0</spirit:value>
+            <spirit:value>43c72d45</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -216,7 +216,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>1ddd43ed</spirit:value>
+            <spirit:value>e5b37681</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -407,7 +407,7 @@
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
-            <spirit:left spirit:format="long">1151</spirit:left>
+            <spirit:left spirit:format="long">863</spirit:left>
             <spirit:right spirit:format="long">0</spirit:right>
           </spirit:vector>
           <spirit:wireTypeDefs>
@@ -424,7 +424,7 @@
         <spirit:wire>
           <spirit:direction>out</spirit:direction>
           <spirit:vector>
-            <spirit:left spirit:format="long">191</spirit:left>
+            <spirit:left spirit:format="long">143</spirit:left>
             <spirit:right spirit:format="long">0</spirit:right>
           </spirit:vector>
           <spirit:wireTypeDefs>
@@ -493,6 +493,10 @@
         <spirit:fileType>verilogSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
+        <spirit:name>hdl/verilog/fpga_ANN50x50_mul_mul_19s_24s_40_1_1.v</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+      </spirit:file>
+      <spirit:file>
         <spirit:name>hdl/verilog/product.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
       </spirit:file>
@@ -543,6 +547,11 @@
       </spirit:file>
       <spirit:file>
         <spirit:name>hdl/verilog/dense_latency_0_0_0_s.v</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/verilog/fpga_ANN50x50_mul_mul_19s_24s_40_1_1.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
@@ -610,6 +619,10 @@
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
+        <spirit:name>hdl/vhdl/fpga_ANN50x50_mul_mul_19s_24s_40_1_1.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+      </spirit:file>
+      <spirit:file>
         <spirit:name>hdl/vhdl/product.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
@@ -636,7 +649,7 @@
       <spirit:file>
         <spirit:name>hdl/vhdl/fpga_ANN50x50.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_83ecb6e9</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_910545b5</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -653,6 +666,11 @@
       </spirit:file>
       <spirit:file>
         <spirit:name>hdl/vhdl/dense_latency_0_0_0_s.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>hdl/vhdl/fpga_ANN50x50_mul_mul_19s_24s_40_1_1.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
       </spirit:file>
@@ -732,7 +750,7 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>clk_period</spirit:name>
-      <spirit:value spirit:id="PARAM_VALUE.clk_period" spirit:order="2">10</spirit:value>
+      <spirit:value spirit:id="PARAM_VALUE.clk_period" spirit:order="2">24</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>machine</spirit:name>
@@ -744,11 +762,11 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>latency</spirit:name>
-      <spirit:value spirit:id="PARAM_VALUE.latency" spirit:order="5">8</spirit:value>
+      <spirit:value spirit:id="PARAM_VALUE.latency" spirit:order="5">11</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>II</spirit:name>
-      <spirit:value spirit:id="PARAM_VALUE.II" spirit:order="6">1</spirit:value>
+      <spirit:value spirit:id="PARAM_VALUE.II" spirit:order="6">4</spirit:value>
     </spirit:parameter>
   </spirit:parameters>
   <spirit:vendorExtensions>
@@ -761,15 +779,15 @@
       </xilinx:taxonomies>
       <xilinx:displayName>Fpga_ann50x50</xilinx:displayName>
       <xilinx:definitionSource>HLS</xilinx:definitionSource>
-      <xilinx:coreRevision>1912061124</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2019-12-06T14:24:56Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>1912101613</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2019-12-10T19:13:43Z</xilinx:coreCreationDateTime>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2019.1</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="bf4b63e7"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="dc5f429f"/>
-      <xilinx:checksum xilinx:scope="ports" xilinx:value="256ac0c7"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="46e9b628"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="bb22c0d3"/>
+      <xilinx:checksum xilinx:scope="ports" xilinx:value="7ae1de77"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="8470b922"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

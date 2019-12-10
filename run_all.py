@@ -7,7 +7,7 @@ import json
 from soil_classifier.dataset import Landsat
 from soil_classifier.models import minimals as models_lib
 from soil_classifier.utils import fpga_report, load_model
-from soil_classifier.utils import model_checkout
+from soil_classifier.utils import model_checkout, ip_checkout
 from soil_classifier.utils import make_config, save_config
 from soil_classifier.utils import convert, build
 
@@ -17,6 +17,7 @@ OUTPUT_FOLDER = cwd + '/outputs/'
 MODELS_FOLDER = cwd + '/models/'
 CONFIG_FOLDER = cwd + '/configs/'
 FPGA_FOLDER = cwd + '/fpga/'
+IPS_FOLDER = cwd + '/ip/'
 
 MODEL_SRC_PATH = OUTPUT_FOLDER
 MODEL_DST_PATH = MODELS_FOLDER
@@ -29,12 +30,13 @@ SEED = 0
 MODEL_NAME = 'ANN50x50'
 
 # Dataset
-X_DATA_PROC = 'standarization'
+X_DATA_PROC = 'standarization' # options: standarization/normalization/original
 Y_DATA_PROC = 'one-hot'
 FPGA_DATA_FORMAT = '%.6f'
 
 # Training
-N_epochs = 10
+# retrain = False
+N_epochs = 200
 batch_size = 32
 do_model_checkout = True
 
@@ -44,6 +46,8 @@ T_CLK = 24 # ns
 IO_TYPE = 'io_parallel' # options: io_serial/io_parallel
 PRECISION = [24, 8]
 REUSE_FACTOR = 4
+STRATEGY = 'Latency' # options: Latency/Resource
+# STRATEGY = 'Resource' # options: Latency/Resource
 
 # Conversion
 HLS_PROJECT = 'hls_' + MODEL_NAME
@@ -52,6 +56,11 @@ CONFIG_FILE = CONFIG_FOLDER + 'keras_config_{model_name}.yml'.format(model_name=
 FPGA_PROJECT_FOLDER = FPGA_FOLDER + 'hls_' + MODEL_NAME + '/'
 FPGA_INFERENCE_FILE = FPGA_PROJECT_FOLDER + 'tb_data/rtl_cosim_results.log'
 OUTPUT_REPORT_FILE = OUTPUT_FOLDER + MODEL_NAME + '_report.json'
+
+# Exporting
+do_ip_checkout = True
+IP_SRC_PATH = FPGA_PROJECT_FOLDER+'fpga_'+MODEL_NAME+'_prj/solution1/impl/ip/'
+IP_DST_PATH = IPS_FOLDER
 
 np.random.seed(SEED)
 
@@ -67,7 +76,8 @@ parameter_report = {'params': {
     't_clk': T_CLK,
     'io_type': IO_TYPE,
     'precision': PRECISION,
-    'reuse_factor': REUSE_FACTOR
+    'reuse_factor': REUSE_FACTOR,
+    'strategy': STRATEGY
 }}
 #%% some functions
 def isnotebook():
@@ -189,6 +199,7 @@ config_str = make_config(model_name=model.name,
                         io_type=IO_TYPE,
                         precision=[PRECISION[0], PRECISION[1]],
                         reuse_factor=REUSE_FACTOR,
+                        strategy=STRATEGY,
                         test_data=TEST_FILES,
                         root_path=cwd)
 
@@ -286,7 +297,21 @@ with open(OUTPUT_REPORT_FILE, 'w') as f:
     json.dump(report, f, indent=4)
 
 #%% IP checkout
-# TODO
+print('\nIP checkout:')
+# check if you are not in a ipython notebook
+if not isnotebook():
+    terminal_input = input('Do you want to checkout FPGA IP generated (it overrides previous IP with same name) y/[n]: ')
+    if terminal_input == 'y':
+        do_ip_checkout = True
+    else:
+        do_ip_checkout = False
+        print('IP checkout denied!')
+
+if do_ip_checkout:
+    print('Doing IP checkout...')
+    ip_checkout(model.name, src_path=IP_SRC_PATH, dst_path=IP_DST_PATH)
+else:
+    print('Your IP has not been checked out, look for it in ' + IP_DST_PATH )
 
 # %%
 print('\n Run is complete!')

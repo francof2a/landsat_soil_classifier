@@ -7,4 +7,4 @@ Family       : zynquplus
 Device       : xazu7eg
 Package      : -fbvb900
 Speed Grade  : -1-i
-Clock Period : 10.000 ns
+Clock Period : 24.000 ns

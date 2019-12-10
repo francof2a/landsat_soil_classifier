@@ -1,0 +1,1 @@
+This folder is a temporal folder for results from scripts.

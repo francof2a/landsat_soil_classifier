@@ -16,22 +16,26 @@ module product (
 
 
 output   ap_ready;
-input  [31:0] a_V;
-input  [27:0] w_V;
-output  [31:0] ap_return;
+input  [23:0] a_V;
+input  [18:0] w_V;
+output  [23:0] ap_return;
 
-wire  signed [27:0] r_V_fu_34_p0;
-wire  signed [31:0] r_V_fu_34_p1;
-wire   [55:0] r_V_fu_34_p2;
+wire  signed [39:0] r_V_fu_43_p2;
+
+fpga_ANN50x50_mul_mul_19s_24s_40_1_1 #(
+    .ID( 1 ),
+    .NUM_STAGE( 1 ),
+    .din0_WIDTH( 19 ),
+    .din1_WIDTH( 24 ),
+    .dout_WIDTH( 40 ))
+fpga_ANN50x50_mul_mul_19s_24s_40_1_1_U1(
+    .din0(w_V),
+    .din1(a_V),
+    .dout(r_V_fu_43_p2)
+);
 
 assign ap_ready = 1'b1;
 
-assign ap_return = {{r_V_fu_34_p2[55:24]}};
-
-assign r_V_fu_34_p0 = w_V;
-
-assign r_V_fu_34_p1 = a_V;
-
-assign r_V_fu_34_p2 = ($signed(r_V_fu_34_p0) * $signed(r_V_fu_34_p1));
+assign ap_return = {{r_V_fu_43_p2[39:16]}};
 
 endmodule //product

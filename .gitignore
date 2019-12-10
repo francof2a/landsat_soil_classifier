@@ -108,7 +108,11 @@ venv.bak/
 
 # project temp folders
 outputs/*
+!outputs/info.txt
 fpga/*
+!fpga/info.txt
+info/
 
 # misc
 statlog.ipynb
+configurations_analysis.ipynb

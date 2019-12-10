@@ -12,31 +12,52 @@ use IEEE.numeric_std.all;
 entity product is
 port (
     ap_ready : OUT STD_LOGIC;
-    a_V : IN STD_LOGIC_VECTOR (31 downto 0);
-    w_V : IN STD_LOGIC_VECTOR (27 downto 0);
-    ap_return : OUT STD_LOGIC_VECTOR (31 downto 0) );
+    a_V : IN STD_LOGIC_VECTOR (23 downto 0);
+    w_V : IN STD_LOGIC_VECTOR (18 downto 0);
+    ap_return : OUT STD_LOGIC_VECTOR (23 downto 0) );
 end;
 
 
 architecture behav of product is 
     constant ap_const_logic_1 : STD_LOGIC := '1';
     constant ap_const_boolean_1 : BOOLEAN := true;
-    constant ap_const_lv32_18 : STD_LOGIC_VECTOR (31 downto 0) := "00000000000000000000000000011000";
-    constant ap_const_lv32_37 : STD_LOGIC_VECTOR (31 downto 0) := "00000000000000000000000000110111";
+    constant ap_const_lv32_10 : STD_LOGIC_VECTOR (31 downto 0) := "00000000000000000000000000010000";
+    constant ap_const_lv32_27 : STD_LOGIC_VECTOR (31 downto 0) := "00000000000000000000000000100111";
     constant ap_const_logic_0 : STD_LOGIC := '0';
 
-    signal r_V_fu_34_p0 : STD_LOGIC_VECTOR (27 downto 0);
-    signal r_V_fu_34_p1 : STD_LOGIC_VECTOR (31 downto 0);
-    signal r_V_fu_34_p2 : STD_LOGIC_VECTOR (55 downto 0);
+    signal r_V_fu_43_p2 : STD_LOGIC_VECTOR (39 downto 0);
+
+    component fpga_ANN50x50_mul_mul_19s_24s_40_1_1 IS
+    generic (
+        ID : INTEGER;
+        NUM_STAGE : INTEGER;
+        din0_WIDTH : INTEGER;
+        din1_WIDTH : INTEGER;
+        dout_WIDTH : INTEGER );
+    port (
+        din0 : IN STD_LOGIC_VECTOR (18 downto 0);
+        din1 : IN STD_LOGIC_VECTOR (23 downto 0);
+        dout : OUT STD_LOGIC_VECTOR (39 downto 0) );
+    end component;
+
 
 
 begin
+    fpga_ANN50x50_mul_mul_19s_24s_40_1_1_U1 : component fpga_ANN50x50_mul_mul_19s_24s_40_1_1
+    generic map (
+        ID => 1,
+        NUM_STAGE => 1,
+        din0_WIDTH => 19,
+        din1_WIDTH => 24,
+        dout_WIDTH => 40)
+    port map (
+        din0 => w_V,
+        din1 => a_V,
+        dout => r_V_fu_43_p2);
+
 
 
 
     ap_ready <= ap_const_logic_1;
-    ap_return <= r_V_fu_34_p2(55 downto 24);
-    r_V_fu_34_p0 <= w_V;
-    r_V_fu_34_p1 <= a_V;
-    r_V_fu_34_p2 <= std_logic_vector(IEEE.numeric_std.resize(unsigned(std_logic_vector(signed(r_V_fu_34_p0) * signed(r_V_fu_34_p1))), 56));
+    ap_return <= r_V_fu_43_p2(39 downto 16);
 end behav;

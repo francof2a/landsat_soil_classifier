@@ -2,8 +2,8 @@
 # Vivado v2019.1 (64-bit)
 # SW Build 2552052 on Fri May 24 14:47:09 MDT 2019
 # IP Build 2548770 on Fri May 24 18:01:18 MDT 2019
-# Start of session at: Fri Dec  6 11:24:45 2019
-# Process ID: 26285
+# Start of session at: Tue Dec 10 16:13:10 2019
+# Process ID: 19405
 # Current directory: /media/data/projects/landsat_soil_classifier/fpga/hls_ANN50x50/fpga_ANN50x50_prj/solution1/impl/ip
 # Command line: vivado -notrace -mode batch -source run_ippack.tcl
 # Log file: /media/data/projects/landsat_soil_classifier/fpga/hls_ANN50x50/fpga_ANN50x50_prj/solution1/impl/ip/vivado.log

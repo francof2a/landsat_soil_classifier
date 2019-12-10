@@ -67,12 +67,13 @@ def make_config(model_name,
                 io_type='io_parallel',
                 precision=[32, 8],
                 reuse_factor=1,
+                strategy='Latency',
                 root_path='./',
                 test_data=None):
     
     '''
 
-    test_data example: ['sat_x_test.dat', 'sat_y_test.dat']
+    test_data example: ['Landsat_x_test.dat', 'Landsat_y_test.dat']
     '''
 
     DATA_FOLDER = root_path + '/data/'
@@ -96,6 +97,8 @@ def make_config(model_name,
     config_str += '  Model:\n'
     config_str += '    Precision: ap_fixed<{},{}>\n'.format(precision[0], precision[1])
     config_str += '    ReuseFactor: {}\n'.format(reuse_factor)
+    if strategy == 'Resource':
+        config_str += '    Strategy: Resource\n'
 
     return config_str
     
@@ -105,14 +108,20 @@ def save_config(config_str, config_file):
     return
 
 
-def ip_checkout(name, root_path, src_path=None, dst_path=None):
+def ip_checkout(name, root_path=None, src_path=None, dst_path=None, version=None):
     if src_path is None:
         src_path = root_path+'/fpga/hls_'+name+'/fpga_'+name+'_prj/solution1/impl/ip/'
 
     if dst_path is None:
         dst_path = root_path+'/ip/'
 
-    ip_folder = name+'_ip'
+    if root_path is None and src_path is None and dst_path is None:
+        raise Exception('You must specify a path for files!')
+    
+    if version is None:
+        version = ''
+
+    ip_folder = name+'_ip'+version
 
     try:
         print('exporting IP of {} from {} to {}'.format(name, src_path, dst_path+ip_folder))
