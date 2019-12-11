@@ -10,6 +10,6 @@ ClockPeriod: 24
 IOType: io_parallel
 HLSConfig:
   Model:
-    Precision: ap_fixed<24,8>
-    ReuseFactor: 16
+    Precision: ap_fixed<16,10>
+    ReuseFactor: 100
     Strategy: Resource

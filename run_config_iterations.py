@@ -35,7 +35,7 @@ Y_DATA_PROC = 'one-hot'
 FPGA_DATA_FORMAT = '%.6f'
 
 # Training
-N_epochs = 10
+N_epochs = 200
 batch_size = 32
 do_model_checkout = True
 
@@ -55,7 +55,7 @@ IO_TYPE = 'io_parallel' # options: io_serial/io_parallel
 # PRECISION = [[36,30], [32,26], [28,22], [24,18], [20,14], [16,10], [12,6]]
 # REUSE_FACTOR = [1]
 # PRECISION = [[32,6], [28,6], [24,6], [20,6], [16,6], [12,6], [8,6]]
-PRECISION = [[32,26], [28,22], [24,18], [20,14], [16,10], [12,6], [8,6]]
+PRECISION = [[32,26], [28,22], [24,18], [20,14], [16,10], [12,6], [8,2]]
 REUSE_FACTOR = [4, 8]
 
 

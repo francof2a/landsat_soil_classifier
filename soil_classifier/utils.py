@@ -69,6 +69,7 @@ def make_config(model_name,
                 reuse_factor=1,
                 strategy='Latency',
                 root_path='./',
+                layers=None,
                 test_data=None):
     
     '''
@@ -99,6 +100,40 @@ def make_config(model_name,
     config_str += '    ReuseFactor: {}\n'.format(reuse_factor)
     if strategy == 'Resource':
         config_str += '    Strategy: Resource\n'
+
+    # layers configurations (optional)
+    # this parameter should be a list of dictionaries.
+    # by name:
+    # layers = [{'name': < >, 'reuse_factor': < >, 'strategy': < >, 'compression': < >}]
+    # by type:
+    # layers = [{'type': < >, 'reuse_factor': < >, 'strategy': < >, 'compression': < >}]
+    # default values: strategy: 'Latency', compression: False
+    if layers is not None:
+        for l in layers:
+            if 'name' in l.keys():
+                config_str += '  LayerName:\n'
+                config_str += '    {}:\n'.format(l['name'])
+                config_str += '        ReuseFactor: {}\n'.format(l['reuse_factor'])
+                if 'strategy' in l.keys():
+                    if l['strategy'] == 'Resource':
+                        config_str += '        Strategy: Resource\n'
+                if 'compresion' in l.keys():
+                    if l['compression'] == True:
+                        config_str += '        Compression: True\n'
+
+            elif 'type' in l.keys():
+                config_str += '  LayerType:\n'
+                config_str += '    {}:\n'.format(l['type'])
+                config_str += '        ReuseFactor: {}\n'.format(l['reuse_factor'])
+                if 'strategy' in l.keys():
+                    if l['strategy'] == 'Resource':
+                        config_str += '        Strategy: Resource\n'
+                if 'compresion' in l.keys():
+                    if l['compression'] == True:
+                        config_str += '        Compression: True\n'            
+            else:
+                pass
+
 
     return config_str
     

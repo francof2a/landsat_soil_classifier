@@ -28,6 +28,7 @@ SEED = 0
 
 # Model
 MODEL_NAME = 'ANN50x50'
+# MODEL_NAME = 'ANN100x100'
 
 # Dataset
 X_DATA_PROC = 'standarization' # options: standarization/normalization/original
@@ -35,19 +36,49 @@ Y_DATA_PROC = 'one-hot'
 FPGA_DATA_FORMAT = '%.6f'
 
 # Training
-# retrain = False
+retrain = False
 N_epochs = 200
 batch_size = 32
 do_model_checkout = True
 
 # Config (conversion Keras to HLS)
+# The max number of multipliers should be less tahn 4096, adjust reuse_factor to be compliant with this.
 PART = 'xazu7eg-fbvb900-1-i'
 T_CLK = 24 # ns
 IO_TYPE = 'io_parallel' # options: io_serial/io_parallel
-PRECISION = [24, 8]
+PRECISION = [16, 10]
 REUSE_FACTOR = 4
-STRATEGY = 'Latency' # options: Latency/Resource
-# STRATEGY = 'Resource' # options: Latency/Resource
+# REUSE_FACTOR = 100
+# STRATEGY = 'Latency' # options: Latency/Resource
+STRATEGY = 'Resource' # options: Latency/Resource
+
+
+# Layer config (optional and only if it is necessary)
+    # this parameter should be a list of dictionaries.
+    # by name:
+    # layers = [{'name': < >, 'reuse_factor': < >, 'strategy': < >, 'compression': < >}]
+    # by type:
+    # layers = [{'type': < >, 'reuse_factor': < >, 'strategy': < >, 'compression': < >}]
+    # default values: strategy: 'Latency', compression: False
+
+# Default
+LAYERS_CONFIG = None
+
+# Custom
+# LAYERS_CONFIG = [{
+#     'name': 'fc1',
+#     'reuse_factor': 10
+# },
+# {
+#     'name': 'fc2',
+#     'reuse_factor': 10
+# },
+# {
+#     'name': 'predictions',
+#     'reuse_factor': 6
+# }
+# ]
+
 
 # Conversion
 HLS_PROJECT = 'hls_' + MODEL_NAME
@@ -108,17 +139,28 @@ np.savetxt(DATA_FOLDER+DATASET_NAME+'_y_test.dat', y_test, fmt=FPGA_DATA_FORMAT)
 TEST_FILES = [DATASET_NAME+'_x_test.dat', DATASET_NAME+'_y_test.dat']
 print('done!')
 
-#%% Model
-print('\nLoading and compiling model {}'.format(MODEL_NAME))
-model = models_lib.new_model(MODEL_NAME)
-model.compile()
-model.summary()
+#%% Model loading or Training
+if retrain == False:
+    try:
+        model = models_lib.new_model(MODEL_NAME)
+        model.load(MODEL_NAME, path=MODELS_FOLDER, verbose=1)
+        model.compile()
+        model.summary()
 
-#%% Training
-print('\nTraining')
-history = model.fit(x_train, y_train,
-                    epochs=N_epochs, batch_size=batch_size,
-                    validation_data=(x_test, y_test))
+    except:
+        print('Model loading fail! we will retrain model')
+        retrain = True
+
+if retrain == True:
+    print('\nLoading and compiling model {}'.format(MODEL_NAME))
+    model = models_lib.new_model(MODEL_NAME)
+    model.compile()
+    model.summary()
+
+    print('\nTraining')
+    history = model.fit(x_train, y_train,
+                        epochs=N_epochs, batch_size=batch_size,
+                        validation_data=(x_test, y_test))
 
 
 #%% evaluation
@@ -131,43 +173,44 @@ print('MODEL {} - train accuracy = {:.3f}'.format(model.name, train_score[1]))
 test_score = model.evaluate(x_test, y_test, verbose=0)
 print('MODEL {} - test accuracy = {:.3f}'.format(model.name, test_score[1]))
 
-# append epochos to history
-epochs = range(1,N_epochs+1)
-history.history.update( {'epochs': epochs})
+if retrain == True:
+    # append epochos to history
+    epochs = range(1,N_epochs+1)
+    history.history.update( {'epochs': epochs})
 
-# save history
-np.save(OUTPUT_FOLDER+'history_{}.npy'.format(model.name), history.history)
-print( 'Training history saved in ' + OUTPUT_FOLDER + 'history_{}.npy'.format(model.name) )
+    # save history
+    np.save(OUTPUT_FOLDER+'history_{}.npy'.format(model.name), history.history)
+    print( 'Training history saved in ' + OUTPUT_FOLDER + 'history_{}.npy'.format(model.name) )
 
-#%% Plot training results
-print('\nSaving training plots in ' + OUTPUT_FOLDER)
-# loss
-fig = plt.figure(figsize=(16,8))
-plt.plot(epochs, history.history['loss'], label='loss')
-plt.plot(epochs, history.history['val_loss'], label='val_loss')
-plt.xlabel('epochs')
-plt.ylabel('loss value')
-plt.xlim(xmin=1)
-plt.ylim(ymin=0)
-plt.grid()
-plt.legend()
-plt.title('{} model - Loss'.format(model.name))
-fig.savefig(OUTPUT_FOLDER+'{}_loss.png'.format(model.name))
-# plt.show(block=False)
+    # Plot training results
+    print('\nSaving training plots in ' + OUTPUT_FOLDER)
+    # loss
+    fig = plt.figure(figsize=(16,8))
+    plt.plot(epochs, history.history['loss'], label='loss')
+    plt.plot(epochs, history.history['val_loss'], label='val_loss')
+    plt.xlabel('epochs')
+    plt.ylabel('loss value')
+    plt.xlim(xmin=1)
+    plt.ylim(ymin=0)
+    plt.grid()
+    plt.legend()
+    plt.title('{} model - Loss'.format(model.name))
+    fig.savefig(OUTPUT_FOLDER+'{}_loss.png'.format(model.name))
+    # plt.show(block=False)
 
-# acc
-fig = plt.figure(figsize=(16,8))
-plt.plot(epochs, history.history['acc'], label='acc')
-plt.plot(epochs, history.history['val_acc'], label='val_acc')
-plt.xlabel('epochs')
-plt.ylabel('accuaracy')
-plt.xlim(xmin=1)
-plt.ylim(ymin=0.6, ymax=1.01)
-plt.grid()
-plt.legend()
-plt.title('{} model - Accuracy'.format(model.name))
-fig.savefig(OUTPUT_FOLDER+'{}_acc.png'.format(model.name))
-# plt.show(block=False)
+    # acc
+    fig = plt.figure(figsize=(16,8))
+    plt.plot(epochs, history.history['acc'], label='acc')
+    plt.plot(epochs, history.history['val_acc'], label='val_acc')
+    plt.xlabel('epochs')
+    plt.ylabel('accuaracy')
+    plt.xlim(xmin=1)
+    plt.ylim(ymin=0.6, ymax=1.01)
+    plt.grid()
+    plt.legend()
+    plt.title('{} model - Accuracy'.format(model.name))
+    fig.savefig(OUTPUT_FOLDER+'{}_acc.png'.format(model.name))
+    # plt.show(block=False)
 
 # %% save model
 print('\nSaving model in ' + OUTPUT_FOLDER)
@@ -176,7 +219,7 @@ model.save(OUTPUT_FOLDER)
 #%% checkout model
 print('\n')
 # check if you are not in a ipython notebook
-if not isnotebook():
+if not isnotebook() and retrain:
     terminal_input = input('Do you want to checkout your model (it overrides previous model with same name) y/[n]: ')
     if terminal_input == 'y':
         do_model_checkout = True
@@ -200,6 +243,7 @@ config_str = make_config(model_name=model.name,
                         precision=[PRECISION[0], PRECISION[1]],
                         reuse_factor=REUSE_FACTOR,
                         strategy=STRATEGY,
+                        layers=LAYERS_CONFIG,
                         test_data=TEST_FILES,
                         root_path=cwd)
 
@@ -208,12 +252,16 @@ save_config(config_str, CONFIG_FILE)
 # %% Conversion and building
 print('Converting from keras to HLS...')
 
+# removing previous FPGA project folder/files
+print('\tremoving previous {model} FPGA project folder/files'.format(model=model.name))
+os.system('rm {prj_folder}* -r'.format(prj_folder=FPGA_PROJECT_FOLDER))
+
 # model conversion
-print('Converting {model} according to {config}'.format(model=model.name, config=CONFIG_FILE))
+print('\tConverting {model} according to {config}'.format(model=model.name, config=CONFIG_FILE))
 convert(CONFIG_FILE)
 
 # model building
-print('Building HLS project into {prj_folder}'.format(prj_folder=FPGA_PROJECT_FOLDER))
+print('\tBuilding HLS project into {prj_folder}'.format(prj_folder=FPGA_PROJECT_FOLDER))
 build(FPGA_PROJECT_FOLDER)
 
 

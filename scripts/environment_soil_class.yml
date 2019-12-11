@@ -69,5 +69,5 @@ dependencies:
     - typing-extensions==3.7.4.1
     - werkzeug==0.16.0
     - wrapt==1.11.2
-prefix: /home/francof2a/anaconda3/envs/soil_class
+
 

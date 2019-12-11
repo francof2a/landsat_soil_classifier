@@ -1,1 +1,0 @@
-This folder is a temporal folder for FPGA project implementation.
