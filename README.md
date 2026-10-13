@@ -1,6 +1,21 @@
 # Landsat Soil Classifier
 Classifier for Landsat satellite multi-spectral images for soil type classification.
 
+> **Project status: archived (2019–2020).** This repository is kept as a historical reference and is no longer maintained.
+> It depends on Python 3.6, TensorFlow 2.0, a vendored and modified 2019 copy of hls4ml, and `vivado_hls` (which AMD/Xilinx retired in 2020.2).
+> Follow-up work on FPGA-deployed crop classification from satellite image time series will continue in a new repository.
+
+## Lessons learned (2026 review)
+A review of this work with current tools (hls4ml 1.3.0) found the following issues. Keep them in mind when reading the results in `outputs/` and in the notebooks.
+
+- **Softmax caused the FPGA vs. float accuracy gap.** The FPGA model scored ~1.5% below the float model even at `ap_fixed<36,8>`. The cause is the lookup-table softmax implementation, not weight quantization. Reproducing it with hls4ml 1.3 C++ emulation (no Vivado needed) and the `legacy` softmax at `<32,8>` gave 0.8805 vs. 0.8935 float. Removing the softmax and taking argmax over the logits gave 100% agreement with the float model from `<24,8>` up. A classifier does not need a softmax layer in hardware.
+- **Throughput was underestimated.** `fpga_report()` in `soil_classifier/utils.py` computes samples per second as `1 / (latency × T_clk)`. For a pipelined design it should be `1 / (II × T_clk)`, where II is the initiation interval. With reuse factor 4 (latency 9, II 4) the reported throughput is ~2.25× too low.
+- **Test data leaked into training.** The test set was passed as `validation_data` during training. There was no separate validation split.
+- **Models were retrained between sweeps without a fixed TensorFlow seed.** The float test accuracy varies between 0.878 and 0.911 across sweeps, so the effect of numeric precision is mixed with the effect of using different models.
+- **Many configurations do not fit the target device.** The `xazu7eg` has about 1728 DSPs and about 230k LUTs. Several HLS estimates exceed that, for example `p36_8_r1` (18,400 DSPs) and `p28_8_r1` (295k LUTs). All resource and timing figures are HLS estimates, with no place & route or timing closure.
+- **The dataset has spatial leakage.** Statlog comes from a single 82×100 pixel sub-area, with overlapping 3×3 neighbourhoods in random order (see `data/sat.doc`). Train and test share neighbouring pixels, which inflates accuracy.
+- **Precision notation (corrected below).** In `ap_fixed<W,I>` the second field is the number of *integer* bits, not decimal bits.
+
 ## Dataset
 Multi-spectral values of pixels in 3x3 neighbourhoods in a satellite image, and the classification associated with the central pixel in each neighbourhood
 
@@ -100,7 +115,7 @@ STRATEGY = 'Latency' # options: Latency/Resource
 - PART: Xilinx FPGA/SoC part number
 - T_CLK: Clock period in nanoseconds
 - IO_TYPE: is the way the input data (samples) are going to be passed to IP core
-- PRECISION: is the numeric precision to implement the model into FPGA. Fisrt field is the total number of bit of values, and second field is the number of bits for decimals.
+- PRECISION: is the numeric precision to implement the model into FPGA, as `ap_fixed<W,I>`. First field is the total number of bits, and second field is the number of integer bits (including sign). The fractional bits are W − I.
 - REUSE_FACTOR: is the maximum number of clock cycles to execute one step calculation into de Model implementation. If you increase this number, the latency increase but the FPGA resources needed are less.
 - STRATEGY: You choose if you want to priorize *Latency* o *Resource*.
 
